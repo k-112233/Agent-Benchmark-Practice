@@ -1,0 +1,11 @@
+{
+  "id": "sample-file-audit",
+  "title": "Sample File Audit",
+  "description": "Check whether synthetic files follow a stated naming rule.",
+  "difficulty": "easy",
+  "timeout_seconds": 120,
+  "tags": [
+    "synthetic",
+    "file-check"
+  ]
+}

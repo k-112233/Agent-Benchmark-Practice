@@ -1,0 +1,7 @@
+task_id,agent,trial,status,runtime_seconds,failure_type
+task-001,agent-a,1,passed,8.4,
+task-001,agent-a,2,failed,12.6,wrong_output
+task-002,agent-a,1,passed,9.9,
+task-002,agent-b,1,timeout,44.2,timeout
+task-003,agent-a,1,error,23.5,environment_error
+task-003,agent-b,1,passed,12.1,

@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test / coverage caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local environment / secrets
+.env
+.env.*
+!.env.example
+
+# Generated local reports
+tools/evaluation-summary/sample-report.md
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# Archives / local exports
+*.zip
+*.7z
+*.rar

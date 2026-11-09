@@ -1,3 +1,5 @@
 # Sample Task
 
-Synthetic example for demonstrating package structure validation. Inspect the sample files and report files that do not follow the naming rule. Do not access files outside the sample directory.
+这是一个用于演示目录结构的合成任务。
+
+假设需要检查一批文件是否符合命名规则，并把不符合规则的文件报告出来。示例包本身不会真正执行这个任务；这里主要用来让 `checker.py` 检查文件结构和元数据。

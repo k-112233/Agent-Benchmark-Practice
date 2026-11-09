@@ -1,14 +1,38 @@
 # Evaluation Summary
 
-一个用于练习 Agent Benchmark 评测结果汇总的小型命令行工具。
+这个小工具读取一份 Trial 结果 CSV，然后做最基础的汇总统计。
 
-## 输入字段
+主要用来练习：
+
+- `csv.DictReader`；
+- 数据合法性检查；
+- `Counter`；
+- Mean / Median；
+- Markdown 报告生成；
+- `unittest`。
+
+## CSV 格式
+
+必须有这些列：
 
 ```text
 task_id,agent,trial,status,runtime_seconds,failure_type
 ```
 
-允许的 `status`：`passed`、`failed`、`error`、`timeout`。
+`status` 只接受：
+
+```text
+passed
+failed
+error
+timeout
+```
+
+示例数据在：
+
+```text
+sample-data/sample-results.csv
+```
 
 ## 运行
 
@@ -16,22 +40,24 @@ task_id,agent,trial,status,runtime_seconds,failure_type
 python .\tools\evaluation-summary\summary.py .\tools\evaluation-summary\sample-data\sample-results.csv
 ```
 
-生成 Markdown 报告：
+保存成 Markdown：
 
 ```powershell
 python .\tools\evaluation-summary\summary.py .\tools\evaluation-summary\sample-data\sample-results.csv --output .\tools\evaluation-summary\sample-report.md
 ```
 
-测试：
+## 单元测试
 
 ```powershell
 python -m unittest discover -s .\tools\evaluation-summary\tests -v
 ```
 
-通过率定义：
+## 当前的 Pass Rate 定义
 
 ```text
 pass_rate = passed_trials / total_trials
 ```
 
-本工具仅使用合成数据，用于公开学习；不连接真实模型，不执行 Agent，也不代表 Terminal-Bench 或 Harbor 官方实现。
+也就是说 `failed`、`error`、`timeout` 都保留在分母中。
+
+这个口径只是为了让练习工具简单清楚。真实 Benchmark 的统计口径可能不同，使用时要先看对应项目的定义。

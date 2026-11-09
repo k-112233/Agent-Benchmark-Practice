@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
+"""对仓库做一次发布前的自动检查。
+
+这个脚本只检查“能自动判断”的项目，例如文件是否存在、测试是否通过。
+它不能替代人工内容审查。
+"""
+
 from __future__ import annotations
 
 import subprocess
 import sys
 from pathlib import Path
 
+# scripts/ 的上一级目录就是仓库根目录。
 ROOT = Path(__file__).resolve().parents[1]
 
 EXPECTED_DIRS = [
@@ -45,41 +52,69 @@ EXPECTED_FILES = [
     "references/open-source-projects.md",
 ]
 
+# 这些文件类型不一定有问题，但公开前通常值得人工确认来源和内容。
 REVIEW_EXTENSIONS = {
-    ".zip", ".7z", ".rar", ".pdf", ".doc", ".docx", ".xls", ".xlsx",
-    ".sav", ".ppt", ".pptx", ".log", ".har", ".pcap", ".sqlite", ".db"
+    ".zip",
+    ".7z",
+    ".rar",
+    ".pdf",
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+    ".sav",
+    ".ppt",
+    ".pptx",
+    ".log",
+    ".har",
+    ".pcap",
+    ".sqlite",
+    ".db",
 }
 
+# 这里只匹配“文件名”，不会扫描普通文档正文。
 REVIEW_NAME_KEYWORDS = {
-    "internal", "private", "confidential", "client", "customer",
-    "appen", "worklog", "acceptance", "验收", "日志", "客户", "内部",
+    "private",
+    "confidential",
+    "secret",
+    "credential",
+    "token",
+    "worklog",
+    "acceptance",
+    "机密",
+    "凭据",
+    "日志",
 }
 
 
 def run(command: list[str]) -> tuple[bool, str]:
+    """在仓库根目录运行命令，返回 (是否成功, 合并后的输出)。"""
+
     result = subprocess.run(
         command,
         cwd=ROOT,
         capture_output=True,
         text=True,
     )
-    text = (result.stdout + result.stderr).strip()
-    return result.returncode == 0, text
+    output = (result.stdout + result.stderr).strip()
+    return result.returncode == 0, output
 
 
 def main() -> int:
     print("=== Agent-Benchmark-Practice Final Audit ===\n")
 
-    failures = []
-    warnings = []
+    failures: list[str] = []
+    warnings: list[str] = []
 
+    # 1. 目录和主要文件完整性。
     print("[1/4] Structure")
-    for rel in EXPECTED_DIRS:
-        if not (ROOT / rel).is_dir():
-            failures.append(f"Missing directory: {rel}")
-    for rel in EXPECTED_FILES:
-        if not (ROOT / rel).is_file():
-            failures.append(f"Missing file: {rel}")
+    for relative_path in EXPECTED_DIRS:
+        if not (ROOT / relative_path).is_dir():
+            failures.append(f"Missing directory: {relative_path}")
+
+    for relative_path in EXPECTED_FILES:
+        if not (ROOT / relative_path).is_file():
+            failures.append(f"Missing file: {relative_path}")
 
     if failures:
         for item in failures:
@@ -87,19 +122,35 @@ def main() -> int:
     else:
         print("  PASS: expected project structure is present.")
 
+    # 2. 分别运行两个工具自己的单元测试。
     print("\n[2/4] Tool tests")
     tests = [
         (
             "Task Package Checker",
-            [sys.executable, "-m", "unittest", "discover",
-             "-s", "tools/task-package-checker/tests", "-v"],
+            [
+                sys.executable,
+                "-m",
+                "unittest",
+                "discover",
+                "-s",
+                "tools/task-package-checker/tests",
+                "-v",
+            ],
         ),
         (
             "Evaluation Summary",
-            [sys.executable, "-m", "unittest", "discover",
-             "-s", "tools/evaluation-summary/tests", "-v"],
+            [
+                sys.executable,
+                "-m",
+                "unittest",
+                "discover",
+                "-s",
+                "tools/evaluation-summary/tests",
+                "-v",
+            ],
         ),
     ]
+
     for name, command in tests:
         ok, output = run(command)
         print(f"\n--- {name} ---")
@@ -107,21 +158,27 @@ def main() -> int:
         if not ok:
             failures.append(f"{name} unit tests failed")
 
+    # 3. 再按 README 中的方式运行两个示例，防止“测试能过但命令跑不通”。
     print("\n[3/4] Sample runs")
     samples = [
         (
             "Task Package Checker sample",
-            [sys.executable,
-             "tools/task-package-checker/checker.py",
-             "tools/task-package-checker/sample-task"],
+            [
+                sys.executable,
+                "tools/task-package-checker/checker.py",
+                "tools/task-package-checker/sample-task",
+            ],
         ),
         (
             "Evaluation Summary sample",
-            [sys.executable,
-             "tools/evaluation-summary/summary.py",
-             "tools/evaluation-summary/sample-data/sample-results.csv"],
+            [
+                sys.executable,
+                "tools/evaluation-summary/summary.py",
+                "tools/evaluation-summary/sample-data/sample-results.csv",
+            ],
         ),
     ]
+
     for name, command in samples:
         ok, output = run(command)
         print(f"\n--- {name} ---")
@@ -129,34 +186,39 @@ def main() -> int:
         if not ok:
             failures.append(f"{name} failed")
 
+    # 4. 找“值得人工看一眼”的文件，不自动删除任何东西。
     print("\n[4/4] Public-repository review")
-    review_files = []
+    review_files: list[str] = []
+
     for path in ROOT.rglob("*"):
         if not path.is_file():
             continue
-        rel = path.relative_to(ROOT)
-        lower_name = str(rel).lower()
+
+        relative_path = path.relative_to(ROOT)
+        lower_name = str(relative_path).lower()
+
         if path.suffix.lower() in REVIEW_EXTENSIONS:
-            review_files.append(str(rel))
+            review_files.append(str(relative_path))
             continue
+
         if any(keyword.lower() in lower_name for keyword in REVIEW_NAME_KEYWORDS):
-            review_files.append(str(rel))
+            review_files.append(str(relative_path))
 
     if review_files:
         warnings.append(
-            "Files below require manual review before publishing; "
-            "their presence is not automatically an error."
+            "Some files require manual review before publishing. "
+            "Their presence is not automatically an error."
         )
         print("  REVIEW:")
         for item in sorted(set(review_files)):
             print("   -", item)
     else:
-        print("  PASS: no obvious binary/archive/internal-named files found.")
+        print("  PASS: no obvious review-target files found.")
 
     print("\n=== RESULT ===")
-    if warnings:
-        for item in warnings:
-            print("WARNING:", item)
+
+    for item in warnings:
+        print("WARNING:", item)
 
     if failures:
         for item in failures:
@@ -165,7 +227,7 @@ def main() -> int:
         return 1
 
     print("FINAL STATUS: STRUCTURE AND AUTOMATED CHECKS PASSED")
-    print("Manual public-content review is still required before GitHub publication.")
+    print("Manual content review is still recommended before publication.")
     return 0
 
 

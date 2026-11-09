@@ -1,7 +1,7 @@
 {
   "id": "sample-file-audit",
   "title": "Sample File Audit",
-  "description": "Check whether synthetic files follow a stated naming rule.",
+  "description": "A synthetic practice task for checking a simple file-naming rule.",
   "difficulty": "easy",
   "timeout_seconds": 120,
   "tags": [

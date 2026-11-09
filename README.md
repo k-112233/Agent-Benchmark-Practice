@@ -1,52 +1,78 @@
-# Agent Benchmark Task Design & Evaluation Practice
+# Agent-Benchmark-Practice
 
-一个围绕 **Agent Benchmark 任务设计、环境执行、测试验证、结果评测与质量控制** 的公开学习项目。
+这是一个用于学习 **Agent Benchmark（智能体评测）** 的练习仓库。
 
-本仓库不复刻内部生产流程，也不提供真实商业任务；内容来自公开资料、个人学习与独立练习。
+我主要参考 Terminal-Bench 和 Harbor 的公开仓库与文档，把看到的概念按自己的理解重新整理，并配了两个可以直接运行的小工具。这个仓库不追求做成完整评测框架，重点是先把任务设计、环境、测试、评测结果和质量检查这条链路弄明白。
 
-## Repository Structure
+## 这个仓库适合谁
+
+如果你已经会一点 Python、Git 和命令行，但刚接触 Agent 评测，可以按顺序阅读。遇到不熟悉的英文术语不用急着一次记住，先知道它在流程里负责什么即可。
+
+## 目录
 
 ```text
 Agent-Benchmark-Practice/
-├── README.md
-├── 01-benchmark-fundamentals/
-├── 02-task-design/
-├── 03-prompt-engineering/
-├── 04-environment-and-execution/
-├── 05-testing-and-evaluation/
-├── 06-quality-assurance/
+├── 01-benchmark-fundamentals/      # Benchmark、Task、Trial 等基础概念
+├── 02-task-design/                 # 怎样把一个想法整理成可评测任务
+├── 03-prompt-engineering/          # 任务指令与约束怎么写清楚
+├── 04-environment-and-execution/   # Docker 与可复现运行环境
+├── 05-testing-and-evaluation/      # 测试、Verifier、评测结果与失败分析
+├── 06-quality-assurance/           # 任务验证与交付前检查
 ├── tools/
-│   ├── task-package-checker/
-│   └── evaluation-summary/
-└── references/
-    └── open-source-projects.md
+│   ├── task-package-checker/       # 练习任务包的静态检查器
+│   └── evaluation-summary/         # 评测结果 CSV 汇总工具
+├── scripts/                        # 整个仓库的自检脚本
+└── references/                     # 公开资料入口
 ```
 
-## Learning Path
+## 推荐阅读顺序
 
-1. **Benchmark Fundamentals** — Benchmark、Task、Agent、Environment、Trial、Job、Verifier 与基础评测指标。
-2. **Task Design** — 任务抽象、任务规范、可解性与难度设计。
-3. **Prompt Engineering** — 目标表达、约束表达、信息边界、歧义控制与迭代修正。
-4. **Environment & Execution** — Docker、依赖管理、环境隔离与可复现执行。
-5. **Testing & Evaluation** — Test Design、Verifier Design、Model Evaluation 与 Failure Analysis。
-6. **Quality Assurance** — 任务描述、文件结构、环境、测试、Verifier、缺陷分级和交付检查。
+第一次看时可以按下面的顺序：
 
-## Practice Tools
+```text
+01 基础概念
+   ↓
+02 任务设计
+   ↓
+04 环境与执行
+   ↓
+05 测试与评测
+   ↓
+03 Prompt 与约束
+   ↓
+06 质量检查
+   ↓
+tools/ 动手运行
+```
 
-### Task Package Checker
+我把 Docker 放在 Prompt 前面，是因为先理解“任务到底在哪运行、最后怎么判定”，再看 Prompt 会更直观。
+
+## 两个可以直接运行的小工具
+
+### 1. Task Package Checker
+
+位置：`tools/task-package-checker/`
+
+它检查一个自定义练习任务包有没有缺文件、元数据字段是否正确等。这里使用的是本仓库自己定义的简化格式，不是 Terminal-Bench 的官方 task schema。
 
 ```powershell
 python .\tools\task-package-checker\checker.py .\tools\task-package-checker\sample-task
+```
+
+运行单元测试：
+
+```powershell
 python -m unittest discover -s .\tools\task-package-checker\tests -v
 ```
 
-这是自定义练习任务包的静态结构检查工具，不执行 Agent、不构建 Docker，也不代表官方任务格式。
+### 2. Evaluation Summary
 
-### Evaluation Summary
+位置：`tools/evaluation-summary/`
+
+它读取一份合成的 Trial 结果 CSV，计算通过率、运行时间和失败类型分布。
 
 ```powershell
 python .\tools\evaluation-summary\summary.py .\tools\evaluation-summary\sample-data\sample-results.csv
-python -m unittest discover -s .\tools\evaluation-summary\tests -v
 ```
 
 生成 Markdown 报告：
@@ -55,45 +81,32 @@ python -m unittest discover -s .\tools\evaluation-summary\tests -v
 python .\tools\evaluation-summary\summary.py .\tools\evaluation-summary\sample-data\sample-results.csv --output .\tools\evaluation-summary\sample-report.md
 ```
 
-当前练习中的通过率：
+运行单元测试：
 
-```text
-Pass Rate = Passed Trials / Total Trials
+```powershell
+python -m unittest discover -s .\tools\evaluation-summary\tests -v
 ```
 
-## Environment
+## 整个仓库自检
 
-工具部分仅使用 Python 标准库，建议 Python 3.9+。
-
-## Public Repository Boundary
-
-- 不包含实习单位内部文件
-- 不包含客户或平台内部任务包
-- 不包含真实商业任务描述
-- 不包含内部 Prompt 模板
-- 不包含内部验收记录、工作日志或执行轨迹
-- 不包含未授权的数据、代码或测试文件
-- 示例任务和评测数据使用独立设计或合成数据
-
-本仓库中的 schema、示例与工具均为学习用途，不应被解释为 Terminal-Bench、Harbor 或其他项目的官方实现。
-
-## References
-
-公开项目和资料统一整理在：
-
-```text
-references/open-source-projects.md
+```powershell
+python .\scripts\project_audit.py
 ```
 
-## Status
+这个脚本会检查目录、两个工具的测试和示例命令，同时提醒是否出现了不适合直接提交到公开仓库的文件类型。
 
-- [x] Benchmark fundamentals
-- [x] Task design
-- [x] Prompt engineering
-- [x] Environment and execution
-- [x] Testing and evaluation
-- [x] Quality assurance
-- [x] Task Package Checker
-- [x] Evaluation Summary
-- [ ] Final repository audit
-- [ ] Public GitHub release
+## 资料来源和项目边界
+
+本仓库的概念学习主要参考 Terminal-Bench、Harbor 以及它们的公开文档。示例任务、示例数据和两个 Python 工具是为了练习而单独编写的。
+
+公开项目中的规则会更新，因此涉及官方格式、命令或贡献要求时，应以对应项目当前文档为准。参考入口见 [`references/open-source-projects.md`](references/open-source-projects.md)。
+
+## 环境
+
+两个 Python 工具只使用标准库，建议使用 Python 3.9 或更高版本。
+
+Docker 只用于第 04 部分的环境学习和示例；运行两个 Python 工具本身不要求安装 Docker。
+
+## License
+
+MIT License，见 [LICENSE](LICENSE)。

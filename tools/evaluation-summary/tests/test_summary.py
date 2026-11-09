@@ -3,6 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+# summary.py 位于 tests/ 的上一级目录。
 TOOL_DIR = Path(__file__).resolve().parents[1]
 if str(TOOL_DIR) not in sys.path:
     sys.path.insert(0, str(TOOL_DIR))
@@ -11,13 +12,18 @@ from summary import load_results, summarize_results
 
 
 class EvaluationSummaryTests(unittest.TestCase):
-    def make_csv(self, content):
+    """Evaluation Summary 的输入校验和指标计算测试。"""
+
+    def make_csv(self, content: str):
+        """创建临时 CSV，并把 TemporaryDirectory 一并返回。"""
+
         temp = tempfile.TemporaryDirectory()
         path = Path(temp.name) / "results.csv"
         path.write_text(content, encoding="utf-8")
         return temp, path
 
     def test_metric_denominator(self):
+        # 只有 1 条 passed，但总记录数是 4，因此 pass rate 应为 25%。
         temp, path = self.make_csv(
             "task_id,agent,trial,status,runtime_seconds,failure_type\n"
             "a,x,1,passed,1.0,\n"

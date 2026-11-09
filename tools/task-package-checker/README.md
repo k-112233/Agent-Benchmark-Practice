@@ -1,18 +1,53 @@
 # Task Package Checker
 
-一个使用 Python 标准库编写的任务包基础检查器，用于检查学习项目中自定义任务包的结构与必要字段。
+这是一个很小的 Python 练习工具，用来检查“自定义练习任务包”的基础结构。
 
-> **格式边界：** 本工具使用本仓库自定义的 `task.json` 示例格式，仅用于练习文件检查与元数据校验。它不是 Terminal-Bench、Harbor 或其他平台的官方任务格式，也不代表其完整规范。
+它适合用来练习：
 
-## 检查内容
+- `pathlib` 路径操作；
+- 读取 JSON；
+- 字段类型检查；
+- 错误和警告的区别；
+- `unittest`。
 
-- 必需文件：`task.json`、`instruction.md`、`environment/Dockerfile`
-- 必需目录：`tests/`，且至少包含一个 `.py` 文件
-- `task.json` 必须是合法 JSON 对象，包含 `id`、`title`、`description`（非空字符串）、`difficulty`（easy/medium/hard）和 `timeout_seconds`（正整数）
-- `instruction.md` 不得为空
-- 缺少可选字段 `tags` 时只产生警告
+## 先说明格式
 
-## 示例结构
+这里的 `task.json` 是本仓库自己设计的简化格式，不是 Terminal-Bench 或 Harbor 的官方任务格式。
+
+## 它会检查什么
+
+必须存在：
+
+```text
+task.json
+instruction.md
+environment/Dockerfile
+tests/
+```
+
+其中 `tests/` 至少需要一个 `.py` 文件。
+
+`task.json` 必须包含：
+
+```text
+id
+title
+description
+difficulty
+timeout_seconds
+```
+
+`difficulty` 只允许：
+
+```text
+easy
+medium
+hard
+```
+
+`tags` 是可选字段，缺少时只提示 warning。
+
+## 示例目录
 
 ```text
 sample-task/
@@ -24,18 +59,31 @@ sample-task/
     └── test_outputs.py
 ```
 
-## 运行（在仓库根目录）
+## 运行
+
+在仓库根目录执行：
 
 ```powershell
-python .\\tools\\task-package-checker\\checker.py .\\tools\\task-package-checker\\sample-task
+python .\tools\task-package-checker\checker.py .\tools\task-package-checker\sample-task
 ```
 
-通过时退出码为 `0`；发现错误时退出码为 `1`。
+如果发现错误，程序退出码为 `1`；结构通过则为 `0`。
 
-## 运行单元测试
+## 单元测试
 
 ```powershell
-python -m unittest discover -s .\\tools\\task-package-checker\\tests -v
+python -m unittest discover -s .\tools\task-package-checker\tests -v
 ```
 
-本工具只检查基础结构和元数据，不验证任务逻辑、Docker 镜像是否成功构建、测试是否真实有效，也不代表任何平台的官方合规检查。仅使用自建或已获授权的练习材料。
+测试覆盖四种情况：正常任务包、缺少 `instruction.md`、非法 difficulty、把布尔值错误地当成 timeout。
+
+## 它没有做什么
+
+这个工具不会：
+
+- 构建 Docker 镜像；
+- 真正执行任务；
+- 判断测试逻辑是否正确；
+- 判断 Task 是否有价值或难度是否合理。
+
+这些属于后续 Task Validation 的范围。

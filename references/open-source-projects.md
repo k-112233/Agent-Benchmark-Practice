@@ -1,62 +1,68 @@
-# Open Source References
+# 公开资料入口
 
-本文件只收录公开资料，用于本项目学习与延伸阅读。
+这个仓库主要根据下面这些公开项目和文档学习。官方项目更新很快，如果本仓库的某个命令、目录结构或术语与最新官方文档不一致，以官方内容为准。
 
 ## Terminal-Bench
 
-Repository:
+仓库：
 
 https://github.com/harbor-framework/terminal-bench
 
-README:
+README：
 
 https://github.com/harbor-framework/terminal-bench/blob/main/README.md
 
-Tasks overview:
+当前任务指南：
 
-https://github.com/harbor-framework/terminal-bench/blob/main/tasks/README.md
+https://github.com/harbor-framework/terminal-bench/blob/main/docs/task-guidelines.md
 
-Contribution guide:
+贡献说明：
 
 https://github.com/harbor-framework/terminal-bench/blob/main/CONTRIBUTING.md
 
-Task proposal / review guidance:
+我在学习任务设计时主要关注 task guidelines 里的几个原则：
 
-https://github.com/harbor-framework/terminal-bench/blob/main/docs/prompts/task-proposal.md
+- Verifiable；
+- Well specified；
+- Solvable；
+- Difficult for a good reason；
+- Realistic / valuable / interesting；
+- Outcome-verified。
 
-Terminal-Bench 将任务质量强调为可解、可验证、说明充分，并通过公开贡献与审查流程持续迭代。本文档仅把这些公开原则作为学习参考，不复制任何内部任务。
+这些原则适合用来理解“为什么一个任务能成为 Benchmark”，但具体任务文件格式仍然要看官方当前版本。
 
 ## Harbor
 
-Repository:
+仓库：
 
 https://github.com/harbor-framework/harbor
 
-Harbor 是 Terminal-Bench 所使用的公开 Agent evaluation framework 之一，可用于理解 Task、Agent、Environment、Trial、Job 等工程对象之间的关系。
+官网与文档入口：
 
-## 本项目与上述项目的关系
+https://www.harborframework.com/
 
-`Agent-Benchmark-Practice`：
+Harbor 是一个用于构建、运行和分析 Agent / Language Model 评测的框架，也是理解 Task、Trial、Job、环境和评测运行流程的重要参考。
 
-- 不是 Terminal-Bench 的 fork；
-- 不是 Harbor 的实现替代；
-- 不使用任何私有任务；
-- 不宣称自定义 schema 是官方 schema；
-- 只基于公开资料总结通用任务设计、测试、评测和 QA 方法；
-- 所有练习数据与示例任务均应保持独立设计或合成。
+## Docker
 
-## 使用建议
+Docker overview：
 
-阅读顺序可以是：
+https://docs.docker.com/get-started/docker-overview/
 
-```text
-Terminal-Bench README
-        ↓
-Terminal-Bench task / contribution docs
-        ↓
-Harbor repository and documentation
-        ↓
-本仓库 01–06 学习模块
-        ↓
-本仓库 tools/
-```
+Dockerfile reference：
+
+https://docs.docker.com/reference/dockerfile/
+
+## GitHub
+
+GitHub Docs：
+
+https://docs.github.com/
+
+主要用于学习仓库管理、README、Git 操作和公开仓库的基本安全检查。
+
+## 本仓库自己的部分
+
+`tools/task-package-checker/` 使用自定义的简化 `task.json`，目的是练习 Python 文件检查，不是 Terminal-Bench task schema。
+
+`tools/evaluation-summary/` 使用合成 CSV，目的是练习最基础的 Trial 结果汇总，也不是 Harbor 的结果解析器。
